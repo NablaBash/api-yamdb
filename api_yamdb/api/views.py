@@ -7,14 +7,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-
 from reviews.models import User
+
 from .permissions import IsAdmin
 from .serializers import (
+    MeSerializer,
     SignupSerializer,
     TokenSerializer,
     UserSerializer,
-    MeSerializer,
 )
 
 

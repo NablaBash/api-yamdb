@@ -1,6 +1,6 @@
-from rest_framework import serializers
 import re
 
+from rest_framework import serializers
 from reviews.models import User
 
 
@@ -29,9 +29,13 @@ class SignupSerializer(serializers.Serializer):
         user_by_email = User.objects.filter(email=email).first()
 
         if user_by_username and user_by_username.email != email:
-            raise serializers.ValidationError({"username": "Этот username уже занят."})
+            raise serializers.ValidationError(
+                {"username": "Этот username уже занят."}
+            )
         if user_by_email and user_by_email.username != username:
-            raise serializers.ValidationError({"email": "Этот email уже занят."})
+            raise serializers.ValidationError(
+                {"email": "Этот email уже занят."}
+            )
 
         return data
 
