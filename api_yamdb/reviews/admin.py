@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import Category, Genre, Title, User
+from .models import Category, Genre, Review, Title, User
 
 
 @admin.register(User)
@@ -36,3 +36,10 @@ class TitleAdmin(admin.ModelAdmin):
     @admin.display(description='Жанр')
     def get_genres(self, obj):
         return ', '.join([genre.name for genre in obj.genre.all()])
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ("id", "text", "author", "score", "pub_date")
+    search_fields = ("text",)
+    list_filter = ("pub_date",)
