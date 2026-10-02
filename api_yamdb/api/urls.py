@@ -5,6 +5,7 @@ from .views import (
     CategoryViewSet,
     GenreViewSet,
     MeView,
+    ReviewViewSet,
     SignupView,
     TitleViewSet,
     TokenView,
@@ -17,6 +18,9 @@ router = DefaultRouter()
 router.register('categories', CategoryViewSet)
 router.register('genres', GenreViewSet)
 router.register('titles', TitleViewSet)
+router.register(
+    r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet, 'title-reviews'
+)
 
 
 urlpatterns = [

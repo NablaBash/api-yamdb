@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+from api_yamdb.constants import MAX_REVIEW_SCORE, MIN_REVIEW_SCORE
 
 
 class Category(models.Model):
@@ -76,3 +79,47 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
+
+
+class Review(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='Произведение',
+        related_name='reviews',
+    )
+    text = models.TextField(
+        verbose_name='Текст отзыва',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор отзыва',
+        related_name='reviews',
+    )
+    score = models.PositiveSmallIntegerField(
+        verbose_name='Оценка произведения',
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(
+                MIN_REVIEW_SCORE,
+                message=f'Миниимальная оценка - {MIN_REVIEW_SCORE}'),
+            MaxValueValidator(
+                MAX_REVIEW_SCORE,
+                message=f'Максимальная оценка - {MAX_REVIEW_SCORE}'),
+        ],
+    )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата и время публикации отзыва',
+        auto_now_add=True,
+    )
+
+    class Meta:
+        ordering = ['-pub_date']
+        verbose_name = 'отзыв'
+        verbose_name_plural = 'Отзывы'
+        constraints = [
+            models.UniqueConstraint(fields=['title', 'author'],
+                                    name='unique_review')
+        ]
