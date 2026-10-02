@@ -1,22 +1,29 @@
 import random
 
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 from rest_framework import filters, generics, mixins, status, viewsets
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import (
+    IsAuthenticated, IsAuthenticatedOrReadOnly
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Title, User
 from .filters import TitleFilter
-from .permissions import IsAdmin, IsAdminOrReadOnly
+from .permissions import (
+    IsAdmin, IsAdminOrReadOnly, IsAuthorModeratorAdminOrReadOnly
+)
 from .serializers import (
     CategorySerializer,
     GenreSerializer,
     MeSerializer,
     ReadTitleSerializer,
+    ReviewSerializer,
     SignupSerializer,
     TokenSerializer,
     UserSerializer,
@@ -55,7 +62,7 @@ class GenreViewSet(
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg("reviews__score"))
     lookup_field = 'id'
     lookup_url_kwarg = 'titles_id'
     filter_backends = (DjangoFilterBackend,)
@@ -161,3 +168,26 @@ class MeView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    """Отзывы на произведения.
+    GET/POST /titles/{title_id}/reviews/ — список и создание (POST — только
+    авторизованным).
+    GET/PATCH/DELETE /titles/{title_id}/reviews/{id}/ — чтение доступно всем,
+    изменение и удаление — автору, модератору или админу.
+    """
+
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly,
+                          IsAuthorModeratorAdminOrReadOnly]
+    http_method_names = ['patch', 'delete', 'get', 'post']
+
+    def get_title(self):
+        return get_object_or_404(Title, id=self.kwargs.get('title_id'))
+
+    def get_queryset(self):
+        return self.get_title().reviews.select_related('author')
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, title=self.get_title())
