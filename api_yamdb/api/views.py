@@ -13,13 +13,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
 from .permissions import (
     IsAdmin, IsAdminOrReadOnly, IsAuthorModeratorAdminOrReadOnly
 )
 from .serializers import (
     CategorySerializer,
+    CommentSerializer,
     GenreSerializer,
     MeSerializer,
     ReadTitleSerializer,
@@ -181,7 +182,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly,
                           IsAuthorModeratorAdminOrReadOnly]
-    http_method_names = ['patch', 'delete', 'get', 'post']
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_title(self):
         return get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -191,3 +192,27 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, title=self.get_title())
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Комментарии к отзывам.
+    GET/POST /titles/{title_id}/reviews/{review_id}/comments/ — список и
+    создание (POST — только авторизованным).
+    GET/PATCH/DELETE /titles/{title_id}/reviews/{review_id}/comments/{id}/ —
+    чтение доступно всем, изменение и удаление — автору, модератору или
+    админу.
+    PUT не поддерживается.
+    """
+
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthorModeratorAdminOrReadOnly]
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def get_review(self):
+        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
+
+    def get_queryset(self):
+        return self.get_review().comments.select_related('author')
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, review=self.get_review())
