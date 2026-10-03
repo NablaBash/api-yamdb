@@ -2,8 +2,9 @@ import re
 
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -47,9 +48,12 @@ class WriteTitleSerializer(serializers.ModelSerializer):
 class ReadTitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        fields = (
+            'id', 'name', 'year', 'description', 'genre', 'category', 'rating'
+        )
         model = Title
 
 
@@ -125,3 +129,21 @@ class MeSerializer(serializers.ModelSerializer):
             "role",
         )
         read_only_fields = ("role",)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+    def validate(self, data):
+        if self.context.get('view').action == 'create':
+            user = self.context.get('request').user
+            title = self.context.get('view').kwargs.get('title_id')
+            if user.reviews.filter(title=title).exists():
+                raise ValidationError('Нельзя оставлять отзыв повторно.')
+        return data
