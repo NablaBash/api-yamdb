@@ -29,10 +29,10 @@ router.register(
 
 
 urlpatterns = [
-    path('auth/signup/', SignupView.as_view()),
-    path('auth/token/', TokenView.as_view()),
-    path('users/', UserListCreateView.as_view()),
-    path('users/me/', MeView.as_view()),
-    path('users/<str:username>/', UserDetailView.as_view()),
-    path('', include(router.urls))
+    path('v1/auth/signup/', SignupView.as_view()),
+    path('v1/auth/token/', TokenView.as_view()),
+    path('v1/users/', UserListCreateView.as_view()),
+    path('v1/users/me/', MeView.as_view()),
+    path('v1/users/<str:username>/', UserDetailView.as_view()),
+    path('v1/', include(router.urls))
 ]

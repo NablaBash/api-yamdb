@@ -4,6 +4,9 @@ from django.db import models
 
 from api_yamdb.constants import MAX_REVIEW_SCORE, MIN_REVIEW_SCORE
 
+from core.models import NameAndSlug
+from reviews.validators import validate_not_future
+
 
 class User(AbstractUser):
     USER = 'user'
@@ -33,44 +36,46 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+class Category(NameAndSlug):
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
-    def __str__(self):
-        return self.name
 
-
-class Genre(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+class Genre(NameAndSlug):
 
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
-    def __str__(self):
-        return self.name
-
 
 class Title(models.Model):
-    name = models.CharField(max_length=256)
-    year = models.IntegerField()
-    description = models.TextField(blank=True, null=True)
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название произведения'
+    )
+    year = models.IntegerField(
+        verbose_name='Год создания',
+        validators=[validate_not_future]
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Описание'
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='titles'
+        related_name='titles',
+        verbose_name='Категория'
     )
     genre = models.ManyToManyField(
         Genre,
-        related_name='titles'
+        related_name='titles',
+        verbose_name='Жанр'
     )
 
     class Meta:
