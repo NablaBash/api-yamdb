@@ -8,13 +8,13 @@ class IsAdmin(BasePermission):
         return request.user.is_authenticated and request.user.is_admin
 
 
-class IsAdminOrReadOnly(BasePermission):
+class IsAdminOrReadOnly(IsAdmin):
     """Читать всем, менять — только админ."""
 
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True
-        return request.user.is_authenticated and request.user.is_admin
+        return super().has_permission(request, view)
 
 
 class IsAuthorModeratorAdminOrReadOnly(BasePermission):
