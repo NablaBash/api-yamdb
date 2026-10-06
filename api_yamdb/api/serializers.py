@@ -84,14 +84,14 @@ class MeSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id',)
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id',)
         model = Genre
 
 
@@ -111,8 +111,7 @@ class WriteTitleSerializer(serializers.ModelSerializer):
         model = Title
 
     def validate_year(self, value):
-        year = timezone.now().year
-        if value > year:
+        if value > timezone.now().year:
             raise serializers.ValidationError(
                 'Год выпуска произведения не может быть больше текущего'
             )

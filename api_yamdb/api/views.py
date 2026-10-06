@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, mixins, status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import (
     IsAuthenticated, IsAuthenticatedOrReadOnly,
@@ -15,6 +15,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
+from .mixins import ReferenceViewSetMixin
 from .permissions import (
     IsAdmin, IsAdminOrReadOnly, IsAuthorModeratorAdminOrReadOnly,
 )
@@ -126,12 +127,7 @@ class MeView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class CategoryViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet
-):
+class CategoryViewSet(ReferenceViewSetMixin):
     """Категории произведений.
     GET/POST /categories/ — список и создание (POST — только
     Администратор).
@@ -140,18 +136,9 @@ class CategoryViewSet(
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    lookup_field = 'slug'
-    filter_backends = (SearchFilter,)
-    search_fields = ('name',)
-    permission_classes = (IsAdminOrReadOnly,)
 
 
-class GenreViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
+class GenreViewSet(ReferenceViewSetMixin):
     """Жанры произведений.
     GET/POST /genres/ — список и создание (POST — только
     Администратор).
@@ -160,10 +147,6 @@ class GenreViewSet(
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    lookup_field = 'slug'
-    filter_backends = (SearchFilter,)
-    search_fields = ('name',)
-    permission_classes = (IsAdminOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
