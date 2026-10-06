@@ -141,11 +141,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
 
     def validate(self, data):
-        if self.context.get('view').action == 'create':
-            user = self.context.get('request').user
-            title = self.context.get('view').kwargs.get('title_id')
-            if user.reviews.filter(title=title).exists():
-                raise ValidationError('Нельзя оставлять отзыв повторно.')
+        view = self.context.get('view')
+        if view.action != 'create':
+            return data
+
+        user = self.context['request'].user
+        title_id = view.kwargs.get('title_id')
+        if user.reviews.filter(title=title_id).exists():
+            raise ValidationError('Нельзя оставлять отзыв повторно.')
+
         return data
 
 
