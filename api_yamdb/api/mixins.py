@@ -8,7 +8,7 @@ class ReferenceViewSetMixin(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
-    viewsets.GenericViewSet
+    viewsets.GenericViewSet,
 ):
     lookup_field = 'slug'
     filter_backends = (SearchFilter,)

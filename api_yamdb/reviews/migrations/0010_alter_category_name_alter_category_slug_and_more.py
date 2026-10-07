@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reviews', '0007_comment'),
+        ('reviews', '0009_alter_user_bio_alter_user_confirmation_code_and_more'),
     ]
 
     operations = [

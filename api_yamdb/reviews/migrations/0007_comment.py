@@ -8,23 +8,53 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reviews', '0006_alter_review_author_alter_review_title'),
+        ("reviews", "0006_alter_review_author_alter_review_title"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Comment',
+            name="Comment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(verbose_name='Текст комментария')),
-                ('pub_date', models.DateTimeField(auto_now_add=True, verbose_name='Дата и время публикации комментария')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL, verbose_name='Автор комментария')),
-                ('review', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='reviews.review', verbose_name='Отзыв')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField(verbose_name="Текст комментария")),
+                (
+                    "pub_date",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        verbose_name="Дата и время публикации комментария",
+                    ),
+                ),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="comments",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Автор комментария",
+                    ),
+                ),
+                (
+                    "review",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="comments",
+                        to="reviews.review",
+                        verbose_name="Отзыв",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'комментарий',
-                'verbose_name_plural': 'Комментарии',
-                'ordering': ['-pub_date'],
+                "verbose_name": "комментарий",
+                "verbose_name_plural": "Комментарии",
+                "ordering": ["-pub_date"],
             },
         ),
     ]

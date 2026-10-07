@@ -13,8 +13,6 @@ csv_to_models = {
     'genre_title.csv': Title.genre.through,
     'review.csv': Review,
     'comments.csv': Comment,
-
-
 }
 
 
@@ -30,9 +28,7 @@ class Command(BaseCommand):
                         row['category_id'] = row.pop('category')
                     elif file_name in ('review.csv', 'comments.csv'):
                         row['author_id'] = row.pop('author')
-                    model.objects.get_or_create(
-                        **row
-                    )
+                    model.objects.get_or_create(**row)
             self.stdout.write(
                 self.style.SUCCESS(
                     f'Данные из файла {file_name} успешно загружены в БД!'

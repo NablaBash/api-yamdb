@@ -9,36 +9,89 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reviews', '0003_category_genre_title'),
+        ("reviews", "0003_category_genre_title"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='category',
-            options={'verbose_name': 'Категория', 'verbose_name_plural': 'Категории'},
+            name="category",
+            options={
+                "verbose_name": "Категория",
+                "verbose_name_plural": "Категории",
+            },
         ),
         migrations.AlterModelOptions(
-            name='genre',
-            options={'verbose_name': 'Жанр', 'verbose_name_plural': 'Жанры'},
+            name="genre",
+            options={"verbose_name": "Жанр", "verbose_name_plural": "Жанры"},
         ),
         migrations.AlterModelOptions(
-            name='title',
-            options={'verbose_name': 'Произведение', 'verbose_name_plural': 'Произведения'},
+            name="title",
+            options={
+                "verbose_name": "Произведение",
+                "verbose_name_plural": "Произведения",
+            },
         ),
         migrations.CreateModel(
-            name='Review',
+            name="Review",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(verbose_name='Текст отзыва')),
-                ('score', models.PositiveSmallIntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(1, message='Миниимальная оценка - 1'), django.core.validators.MaxValueValidator(10, message='Максимальная оценка - 10')], verbose_name='Оценка произведения')),
-                ('pub_date', models.DateTimeField(auto_now_add=True, verbose_name='Дата и время публикации отзыва')),
-                ('author', models.ForeignKey(db_column='author', on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to=settings.AUTH_USER_MODEL, verbose_name='Автор отзыва')),
-                ('title', models.ForeignKey(db_column='title_id', on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.title', verbose_name='Произведение')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField(verbose_name="Текст отзыва")),
+                (
+                    "score",
+                    models.PositiveSmallIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(
+                                1, message="Миниимальная оценка - 1"
+                            ),
+                            django.core.validators.MaxValueValidator(
+                                10, message="Максимальная оценка - 10"
+                            ),
+                        ],
+                        verbose_name="Оценка произведения",
+                    ),
+                ),
+                (
+                    "pub_date",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        verbose_name="Дата и время публикации отзыва",
+                    ),
+                ),
+                (
+                    "author",
+                    models.ForeignKey(
+                        db_column="author",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reviews",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Автор отзыва",
+                    ),
+                ),
+                (
+                    "title",
+                    models.ForeignKey(
+                        db_column="title_id",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reviews",
+                        to="reviews.title",
+                        verbose_name="Произведение",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'отзыв',
-                'verbose_name_plural': 'Отзывы',
-                'ordering': ['-pub_date'],
+                "verbose_name": "отзыв",
+                "verbose_name_plural": "Отзывы",
+                "ordering": ["-pub_date"],
             },
         ),
     ]

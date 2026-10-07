@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser
+﻿from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -18,10 +18,26 @@ class User(AbstractUser):
         (ADMIN, 'Администратор'),
     ]
 
-    email = models.EmailField(unique=True, max_length=254)
-    bio = models.TextField(blank=True)
-    role = models.CharField(max_length=20, choices=ROLES, default=USER)
-    confirmation_code = models.CharField(max_length=50, blank=True)
+    email = models.EmailField(
+        unique=True,
+        max_length=254,
+        verbose_name='Email',
+    )
+    bio = models.TextField(
+        blank=True,
+        verbose_name='Биография',
+    )
+    role = models.CharField(
+        max_length=20,
+        choices=ROLES,
+        default=USER,
+        verbose_name='Роль',
+    )
+    confirmation_code = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name='Код подтверждения',
+    )
 
     @property
     def is_admin(self):
@@ -52,17 +68,13 @@ class Genre(NameAndSlug):
 
 class Title(models.Model):
     name = models.CharField(
-        max_length=256,
-        verbose_name='Название произведения'
+        max_length=256, verbose_name='Название произведения'
     )
     year = models.IntegerField(
-        verbose_name='Год создания',
-        validators=[validate_not_future]
+        verbose_name='Год создания', validators=[validate_not_future]
     )
     description = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name='Описание'
+        blank=True, null=True, verbose_name='Описание'
     )
     category = models.ForeignKey(
         Category,
@@ -70,12 +82,12 @@ class Title(models.Model):
         null=True,
         blank=True,
         related_name='titles',
-        verbose_name='Категория'
+        verbose_name='Категория',
     )
     genre = models.ManyToManyField(
         Genre,
         related_name='titles',
-        verbose_name='Жанр'
+        verbose_name='Жанр',
     )
 
     class Meta:
@@ -87,7 +99,9 @@ class Title(models.Model):
 
 
 class AuthorTextModelMixin(models.Model):
-    text = models.TextField(verbose_name='Текст',)
+    text = models.TextField(
+        verbose_name='Текст',
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -110,6 +124,9 @@ class Review(AuthorTextModelMixin):
         verbose_name='Произведение',
         related_name='reviews',
     )
+    text = models.TextField(
+        verbose_name='Текст отзыва',
+    )
     score = models.PositiveSmallIntegerField(
         verbose_name='Оценка произведения',
         null=True,
@@ -117,10 +134,12 @@ class Review(AuthorTextModelMixin):
         validators=[
             MinValueValidator(
                 MIN_REVIEW_SCORE,
-                message=f'Миниимальная оценка - {MIN_REVIEW_SCORE}'),
+                message=f'Миниимальная оценка - {MIN_REVIEW_SCORE}',
+            ),
             MaxValueValidator(
                 MAX_REVIEW_SCORE,
-                message=f'Максимальная оценка - {MAX_REVIEW_SCORE}'),
+                message=f'Максимальная оценка - {MAX_REVIEW_SCORE}',
+            ),
         ],
     )
 
@@ -129,8 +148,9 @@ class Review(AuthorTextModelMixin):
         verbose_name_plural = 'Отзывы'
         default_related_name = 'reviews'
         constraints = [
-            models.UniqueConstraint(fields=['title', 'author'],
-                                    name='unique_review')
+            models.UniqueConstraint(
+                fields=['title', 'author'], name='unique_review'
+            )
         ]
 
 
@@ -139,7 +159,7 @@ class Comment(AuthorTextModelMixin):
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Отзыв'
+        verbose_name='Отзыв',
     )
 
     class Meta:
