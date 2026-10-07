@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("reviews", "0007_comment"),
+        ('reviews', '0008_alter_comment_options_alter_review_options_and_more'),
     ]
 
     operations = [

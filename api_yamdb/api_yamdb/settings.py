@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django_filters",
     "api",
     "reviews",
+    "core",
 ]
 
 AUTH_USER_MODEL = "reviews.User"

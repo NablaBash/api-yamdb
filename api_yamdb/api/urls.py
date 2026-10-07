@@ -13,22 +13,22 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register("categories", CategoryViewSet)
-router.register("genres", GenreViewSet)
-router.register("titles", TitleViewSet)
-router.register("users", UserViewSet, basename="users")
+router.register('categories', CategoryViewSet)
+router.register('genres', GenreViewSet)
+router.register('titles', TitleViewSet)
+router.register('users', UserViewSet, basename='users')
 router.register(
-    r"titles/(?P<title_id>\d+)/reviews", ReviewViewSet, basename="reviews"
+    r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet, basename='reviews'
 )
 router.register(
-    r"titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments",
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
-    basename="comments",
+    basename='comments',
 )
 
 
 urlpatterns = [
-    path("auth/signup/", SignupView.as_view(), name="signup"),
-    path("auth/token/", TokenView.as_view(), name="token"),
-    path("", include(router.urls)),
+    path('auth/signup/', SignupView.as_view(), name='signup'),
+    path('auth/token/', TokenView.as_view(), name='token'),
+    path('', include(router.urls)),
 ]
