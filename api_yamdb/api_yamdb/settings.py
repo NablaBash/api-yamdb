@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django_filters",
     "api",
     "reviews",
+    "core",
 ]
 
 AUTH_USER_MODEL = "reviews.User"
@@ -110,3 +111,5 @@ SIMPLE_JWT = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = 'sent_emails'
+
+DEFAULT_FROM_EMAIL = 'noreply@yamdb.fake'

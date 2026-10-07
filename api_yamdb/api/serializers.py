@@ -2,8 +2,7 @@ import re
 
 from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-
+from rest_framework.exceptions import NotFound, ValidationError
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
@@ -44,15 +43,22 @@ class SignupSerializer(serializers.Serializer):
 
 
 class TokenSerializer(serializers.Serializer):
-    """Получение токена: username + confirmation_code."""
-
     username = serializers.CharField(max_length=150)
     confirmation_code = serializers.CharField()
 
+    def validate(self, data):
+        user = User.objects.filter(username=data['username']).first()
+        if user is None:
+            raise NotFound('Пользователь не найден.')
+        if user.confirmation_code != data['confirmation_code']:
+            raise serializers.ValidationError(
+                {'confirmation_code': 'Неверный код подтверждения.'}
+            )
+        data['user'] = user
+        return data
+
 
 class UserSerializer(serializers.ModelSerializer):
-    """Для /users/ и /users/{username}/ — админ создаёт и смотрит."""
-
     class Meta:
         model = User
         fields = (
@@ -65,45 +71,31 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class MeSerializer(serializers.ModelSerializer):
-    """Для /users/me/ — свой профиль. Роль менять нельзя."""
-
-    class Meta:
-        model = User
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'bio',
-            'role',
-        )
+class MeSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id',)
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id',)
         model = Genre
 
 
 class WriteTitleSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
-        many=True,
-        slug_field='slug',
-        queryset=Genre.objects.all()
+        many=True, slug_field='slug', queryset=Genre.objects.all()
     )
     category = serializers.SlugRelatedField(
-        slug_field='slug',
-        queryset=Category.objects.all()
+        slug_field='slug', queryset=Category.objects.all()
     )
 
     class Meta:
@@ -111,8 +103,7 @@ class WriteTitleSerializer(serializers.ModelSerializer):
         model = Title
 
     def validate_year(self, value):
-        year = timezone.now().year
-        if value > year:
+        if value > timezone.now().year:
             raise serializers.ValidationError(
                 'Год выпуска произведения не может быть больше текущего'
             )
@@ -126,7 +117,13 @@ class ReadTitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category', 'rating'
+            'id',
+            'name',
+            'year',
+            'description',
+            'genre',
+            'category',
+            'rating',
         )
         model = Title
 
@@ -141,11 +138,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
 
     def validate(self, data):
-        if self.context.get('view').action == 'create':
-            user = self.context.get('request').user
-            title = self.context.get('view').kwargs.get('title_id')
-            if user.reviews.filter(title=title).exists():
-                raise ValidationError('Нельзя оставлять отзыв повторно.')
+        view = self.context.get('view')
+        if view.action != 'create':
+            return data
+
+        user = self.context['request'].user
+        title_id = view.kwargs.get('title_id')
+        if user.reviews.filter(title=title_id).exists():
+            raise ValidationError('Нельзя оставлять отзыв повторно.')
+
         return data
 
 
