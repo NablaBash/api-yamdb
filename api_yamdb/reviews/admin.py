@@ -12,6 +12,7 @@ class UserAdmin(BaseUserAdmin):
         ('Дополнительно', {'fields': ('role', 'bio', 'confirmation_code')}),
     )
 
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')

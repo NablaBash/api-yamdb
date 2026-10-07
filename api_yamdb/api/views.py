@@ -114,7 +114,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
 class CategoryViewSet(ReferenceViewSetMixin):
     """Категории произведений.
     GET/POST /categories/ — список и создание (POST — только
@@ -124,6 +123,7 @@ class CategoryViewSet(ReferenceViewSetMixin):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
 
 class GenreViewSet(ReferenceViewSetMixin):
     """Жанры произведений.
