@@ -12,6 +12,7 @@ from .views import (
     UserViewSet,
 )
 
+
 router = DefaultRouter()
 router.register('categories', CategoryViewSet)
 router.register('genres', GenreViewSet)
@@ -25,7 +26,6 @@ router.register(
     CommentViewSet,
     basename='comments',
 )
-
 
 urlpatterns = [
     path('v1/auth/signup/', SignupView.as_view(), name='signup'),
