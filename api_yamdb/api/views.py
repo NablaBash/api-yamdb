@@ -1,5 +1,6 @@
 import random
 
+from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
@@ -14,8 +15,8 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Genre, Review, Title, User
 
+from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
 from .mixins import ReferenceViewSetMixin
 from .permissions import (
@@ -61,7 +62,7 @@ class SignupView(APIView):
         send_mail(
             subject='YaMDb confirmation code',
             message=f'Your confirmation code: {confirmation_code}',
-            from_email=None,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[email],
         )
 
