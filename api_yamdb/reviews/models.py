@@ -3,7 +3,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from api_yamdb.constants import MAX_REVIEW_SCORE, MIN_REVIEW_SCORE
-
 from core.models import AuthorText, NameAndSlug
 from reviews.validators import validate_not_future
 
