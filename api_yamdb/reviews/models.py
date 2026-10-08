@@ -4,7 +4,7 @@ from django.db import models
 
 from api_yamdb.constants import MAX_REVIEW_SCORE, MIN_REVIEW_SCORE
 
-from core.models import NameAndSlug
+from core.models import AuthorText, NameAndSlug
 from reviews.validators import validate_not_future
 
 
@@ -98,26 +98,7 @@ class Title(models.Model):
         return self.name
 
 
-class AuthorTextModelMixin(models.Model):
-    text = models.TextField(
-        verbose_name='Текст',
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name='Автор',
-    )
-    pub_date = models.DateTimeField(
-        verbose_name='Дата и время публикации',
-        auto_now_add=True,
-    )
-
-    class Meta:
-        abstract = True
-        ordering = ['-pub_date']
-
-
-class Review(AuthorTextModelMixin):
+class Review(AuthorText):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -154,7 +135,7 @@ class Review(AuthorTextModelMixin):
         ]
 
 
-class Comment(AuthorTextModelMixin):
+class Comment(AuthorText):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
